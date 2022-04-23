@@ -1,45 +1,39 @@
 const express = require('express');
-const dotenv = require('dotenv');
 const dbConnect = require('./config/dbConnect');
-const { registerUser } = require('./controllers/users/usersCtrl');
-const { errorHandler,notFound } = require('./middlewares/errorMiddleware');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const { errorHandler, notFound } = require('./middlewares/errorMiddleware');
 const userRoute = require('./routes/users/usersRoute');
-const incomeRoute = require('./routes/income/incomeRoutes');
+const incomeRoute = require('./routes/income/incomeRoute');
 const expenseRoute = require('./routes/expenses/expenseRoutes');
 
 const app = express();
 
-//env
-
+//env 
 dotenv.config();
 
-
-//dbConnect
+// dbConnect
 dbConnect();
 
-
-//middleware
-
+//middlewares
 app.use(express.json());
+app.use(cors());
 
-app.get('/',(req, res) => {
-    res.json({msg: 'Welcome to expenses tracker'})
-})
+app.get('/', (req, res) => {
+    res.json({msg: 'Welcome to expense tracker API'});
+});
 
-//users routes
+// user routes
+app.use("/api/users", userRoute);
 
-app.use('/api/users',userRoute);
-
-//income routes
+// income route
 app.use("/api/income", incomeRoute);
 
-//expense route
-app.use("api/expenses", expenseRoute);
+// expense route
+app.use("/api/expenses", expenseRoute);
 
-//error
+// error 
 app.use(notFound);
 app.use(errorHandler);
 
-
 module.exports = app;
-
