@@ -12,6 +12,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^7.1.0"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "express-async-handler": "^1.2.0"
