@@ -19,6 +19,11 @@ const expenseSchema = mongoose.Schema({
         required: [true, 'Amount is required'],
         type: Number,
     },
+    createdAt:{ 
+        type: Date, 
+        required: false, 
+        default: Date.now 
+    },
     user:{
         type: mongoose.Schema.Types.ObjectId, //must be mongodb id
         ref:'User',
