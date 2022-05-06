@@ -17,6 +17,7 @@ dbConnect();
 
 //middlewares
 app.use(express.json());
+//or app.use(cors({ credentials: true }));
 app.use(cors());
 
 app.get('/', (req, res) => {

@@ -1,30 +1,51 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {useFormik} from "formik";
-import { useDispatch } from "react-redux"; 
 import * as Yup from "yup";
+import {useHistory} from "react-router-dom"
+import { useDispatch, useSelector } from "react-redux";
 import { loginUserAction } from "../../redux/slices/users/usersSlices";
+import DisabledButton from "../../components/DisabledButton";
 
-// form validations
+
+//Using Yup for form validations and bind with formik
 const formSchema = Yup.object({
   email: Yup.string().required("Email is required"),
-  password: Yup.string().required("Password is required")
+  password: Yup.string().required("Password is required"),
 });
 
 const Login = () => {
+
+  //History show user all the methods
+  const history = useHistory();
+
   //dispatch
   const dispatch = useDispatch();
 
-  // formik form 
-  const formik = useFormik({
+  //get data from store
+  //Access data in dispatch (error and response messages)
+  const user = useSelector(state => state?.users);
+  const {userAppErr, userServerErr, userLoading, userAuth} = user;
+
+  //formik form
+  const formik = useFormik({ 
     initialValues:{
       email: "",
       password: "",
     },
-    onSubmit: (values) => {
-      dispatch(loginUserAction(values));
+    onSubmit: values =>{
+      dispatch(loginUserAction(values))
     },
+    //Binding Yup with Formik
     validationSchema: formSchema,
-  });
+  }
+  );
+
+  //redirect
+  useEffect(()=> {
+    if(userAuth) {
+      return history.push("/profile");
+    }
+  }, [userAuth]);
 
   return (
     <section
@@ -49,13 +70,14 @@ const Login = () => {
               <h3 className="fw-bold mb-5">Login to your account</h3>
               {/* Display Err */}
 
-              {/* {userAppErr || userServerErr ? (
+              {userAppErr || userServerErr ? (
                 <div class="alert alert-danger" role="alert">
                   {userServerErr} {userAppErr}
                 </div>
-              ) : null} */}
+              ) : null} 
               <form onSubmit={formik.handleSubmit}>
                 <input
+                  //Bind input into email value in formik
                   value={formik.values.email}
                   onChange={formik.handleChange("email")}
                   onBlur={formik.handleBlur("email")}
@@ -63,10 +85,10 @@ const Login = () => {
                   type="email"
                   placeholder="E-mail address"
                 />
-                {/* Err */}
-                <div className="text-danger mb-2">
+                {/* Yup input error handler for email */}
+                {<div className="text-danger mb-2">
                   {formik.touched.email && formik.errors.email}
-                </div>
+                </div> }
                 <input
                   value={formik.values.password}
                   onChange={formik.handleChange("password")}
@@ -75,18 +97,22 @@ const Login = () => {
                   type="password"
                   placeholder="Password"
                 />
-                {/* Err */}
-                <div className="text-danger mb-2">
+                {/* Yup input error handler for password */}
+                {<div className="text-danger mb-2">
                   {formik.touched.password && formik.errors.password}
-                </div>
+                </div>}
 
                 <div>
+                  {userLoading? (
+                  <DisabledButton />
+                  ) : (
                   <button
                     type="submit"
                     className="btn btn-primary py-2 w-100 mb-4"
                   >
                     Login
                   </button>
+                  )}
                 </div>
               </form>
             </div>
