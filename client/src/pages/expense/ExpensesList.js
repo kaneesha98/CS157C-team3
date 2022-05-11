@@ -1,21 +1,30 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AppPagination from "../../components/AppPagination";
 import ContentDetails from "../../components/ContentDetails";
-import { fetchAllExpAction } from "../../redux/slices/expenses/expensesSlices";
+import { fetchAllExpenseAction } from "../../redux/slices/expenses/expensesSlices";
 
 const ExpensesList = () => {
-  //dispatch
-  const dispatch = useDispatch();
-  const [page, setPage] = useState(1);
-  //get all expenses 
-  const allExpenses = useSelector(state => state.expenses);
-  const {loading, appErr, serverErr, expensesList} = allExpenses
-  console.log("page number: " + page);
-  useEffect(() => {
-    dispatch(fetchAllExpAction(+page));
-  },[dispatch,page]);
+//Not admin
+const navigate = useNavigate();
+const isAdmin = useSelector(state => state?.users?.userAuth?.isAdmin);
+useEffect(() => {
+  if(!isAdmin)navigate("/user-expenses");
+});
+
+//dispatch
+const dispatch = useDispatch();
+const [page, setPage] = useState(1)
+
+useEffect(() => {
+  dispatch(fetchAllExpenseAction(page));
+}, [dispatch, page, setPage]);
+
+//get all expenses 
+const allExpenses = useSelector(state => state?.expenses);
+const {loading, appErr, serverErr, expensesList} = allExpenses;
+//console.log(page);
   return (
     <>
       <section className="py-6">
@@ -27,7 +36,7 @@ const ExpensesList = () => {
               <p className="mb-0">
                 Below is the history of your expense transactions records
               </p>
-              <Link to="/" className="btn  btn-outline-danger me-2 m-2">
+              <Link to="/add-expense" className="btn  btn-outline-danger me-2 m-2">
                 New Expense
               </Link>
             </div>
@@ -66,8 +75,7 @@ const ExpensesList = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody>
-                {loading ? (
+              <tbody>{loading ? (
                     <h1>Loading...</h1>
                   ) : appErr || serverErr ? (
                     <div>Err</div>
@@ -77,8 +85,7 @@ const ExpensesList = () => {
                     expensesList?.docs?.map(exp => (
                       <ContentDetails item={exp} key={exp?._id} />
                     ))
-                  )}
-              </tbody>
+                  )}</tbody>
             </table>
           </div>
         </div>
@@ -90,9 +97,9 @@ const ExpensesList = () => {
             marginTop: "20px",
           }}
         >
-          <AppPagination 
-          setPage = {setPage}
-          pageNumber={expensesList.totalPages}/>
+        <AppPagination 
+        setPage = {setPage}
+        pageNumber={expensesList?.totalPages}/>
         </div>
       </section>
     </>

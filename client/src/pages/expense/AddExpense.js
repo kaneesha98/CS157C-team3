@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import moneySVG from "../../img/money.svg";
 import {useFormik} from "formik";
 import * as Yup from "yup";
-import DisabledButton from "../../components/DisabledButton";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { createExpAction } from "../../redux/slices/expenses/expensesSlices";
+import { useNavigate } from "react-router-dom";
+import dateFormatter from "../../utils/dateFormatter";
+
 
 //Using Yup for form validations and bind with formik
 const formSchema = Yup.object({
@@ -14,6 +16,7 @@ const formSchema = Yup.object({
 });
 
 const AddExpense = () => {
+  const navigate = useNavigate();
   //dispatch
   const dispatch = useDispatch();
   //formik form
@@ -22,14 +25,19 @@ const AddExpense = () => {
       title: "",
       description: "",
       amount: "",
+      createdAt:  ""
     },
     onSubmit: values =>{
-      dispatch(createExpAction(values))
+      //console.log(values.createdAt);
+      dispatch(createExpAction(values));
+      navigate("/expenses");
     },
     //Binding Yup with Formik
     validationSchema: formSchema,
-  }
-  );
+  });
+
+  //Get expense from Stored
+  //const state = useSelector(state => state?.expenses);
   return (
     <>
       <section className="py-5 bg-danger vh-100">
@@ -48,12 +56,6 @@ const AddExpense = () => {
                 <form onSubmit={formik.handleSubmit}>
                   <span className="text-muted">Expense</span>
                   <h2 className="mb-4 fw-light">Record New Expense</h2>
-                  {/* Display income Err */}
-                  {/* {expServerErr || expAppErr ? (
-                    <div className="alert alert-danger" role="alert">
-                      {expServerErr} {expAppErr}
-                    </div>
-                  ) : null} */}
                   <div className="mb-3 input-group">
                     <input
                       value={formik.values.title}
@@ -64,7 +66,6 @@ const AddExpense = () => {
                       placeholder="Enter Title"
                     />
                   </div>
-                  {/* Err */}
                   <div className="text-danger mb-2">
                     {formik.touched.title && formik.errors.title}
                   </div>
@@ -78,7 +79,6 @@ const AddExpense = () => {
                       placeholder="Enter Description"
                     />
                   </div>
-                  {/* Err */}
                   <div className="text-danger mb-2">
                     {formik.touched.description && formik.errors.description}
                   </div>
@@ -92,11 +92,18 @@ const AddExpense = () => {
                       placeholder="Enter Amount"
                     />
                   </div>
-                  {/* Err */}
                   <div className="text-danger mb-2">
                     {formik.touched.amount && formik.errors.amount}
-                    </div>
-                  {/* Err */}
+                  </div>
+                  <div className="mb-3 input-group">
+                    <input
+                      valueAsDate={formik.values.createdAt}
+                      onChange={formik.handleChange("createdAt")}
+                      onBlur={formik.handleBlur("createdAt")}
+                      className="form-control"
+                      type="date"
+                    />
+                  </div>
                   <button type="submit" className="btn btn-danger mb-4 w-100">
                     Record Expense
                   </button>
