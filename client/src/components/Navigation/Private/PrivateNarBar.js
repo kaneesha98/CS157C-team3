@@ -5,7 +5,6 @@ import { logout } from "../../../redux/slices/users/usersSlices";
 
 const PrivateNavbar = () => {
   const dispatch = useDispatch();
-
   return (
     <>
       <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
@@ -14,7 +13,7 @@ const PrivateNavbar = () => {
             <i class="bi bi-currency-exchange fs-1 text-warning "></i>
           </Link>
           <button
-            class="navbar-toggler"
+            className="navbar-toggler"
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#navbarSupportedContent"
@@ -33,7 +32,7 @@ const PrivateNavbar = () => {
               </li>
 
               <li class="nav-item">
-                <Link to="/incomes" className="nav-link active">
+                <Link to="/income" className="nav-link active">
                   Income List
                 </Link>
               </li>
@@ -57,7 +56,10 @@ const PrivateNavbar = () => {
                 New Income
               </Link>
               <button
-                onClick={() => dispatch(logout())}
+                onClick={() => {
+                  dispatch(logout());
+                }
+                }
                 className="btn btn-warning me-2"
               >
                 Logout

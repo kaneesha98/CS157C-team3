@@ -1,52 +1,49 @@
 import React, { useEffect } from "react";
-import {useFormik} from "formik";
-import * as Yup from "yup";
-import {useHistory} from "react-router-dom"
+import { useFormik } from "formik";
+//useDispatch - receive action, useSelector - select a state
 import { useDispatch, useSelector } from "react-redux";
+import * as Yup from "yup";
 import { loginUserAction } from "../../redux/slices/users/usersSlices";
 import DisabledButton from "../../components/DisabledButton";
+import { useNavigate } from "react-router-dom";
 
-
-//Using Yup for form validations and bind with formik
-const formSchema = Yup.object({
-  email: Yup.string().required("Email is required"),
-  password: Yup.string().required("Password is required"),
-});
 
 const Login = () => {
-
-  //History show user all the methods
-  const history = useHistory();
-
   //dispatch
   const dispatch = useDispatch();
 
-  //get data from store
-  //Access data in dispatch (error and response messages)
+  //Navigate 
+  const navigate = useNavigate();
+
+  //get user data from store - redux 
   const user = useSelector(state => state?.users);
   const {userAppErr, userServerErr, userLoading, userAuth} = user;
 
-  //formik form
-  const formik = useFormik({ 
-    initialValues:{
-      email: "",
-      password: "",
-    },
-    onSubmit: values =>{
-      dispatch(loginUserAction(values))
-    },
-    //Binding Yup with Formik
-    validationSchema: formSchema,
-  }
-  );
+  console.log(user);
 
-  //redirect
-  useEffect(()=> {
-    if(userAuth) {
-      return history.push("/profile");
-    }
-  }, [userAuth]);
-
+    //yup validation
+    const formSchema = Yup.object({
+      email: Yup.string().required("Email is required"),
+      password: Yup.string().required("Password is required"),
+    });
+    
+    //formik form
+    const formik = useFormik({
+      initialValues: {
+        email: "",
+        password: "",
+      },
+      onSubmit: values => {
+        dispatch(loginUserAction(values));
+        console.log(values)
+      },
+      validationSchema: formSchema,
+    });
+  
+    //Redirect to pages
+    useEffect(()=>{
+      if(userAuth) return  navigate("/");
+    })
   return (
     <section
       style={{ height: "100vh" }}
@@ -68,16 +65,13 @@ const Login = () => {
             <div className="p-5 bg-light rounded text-center">
               <span className="text-muted">Sign In</span>
               <h3 className="fw-bold mb-5">Login to your account</h3>
-              {/* Display Err */}
-
               {userAppErr || userServerErr ? (
                 <div class="alert alert-danger" role="alert">
                   {userServerErr} {userAppErr}
                 </div>
-              ) : null} 
+              ) : null}
               <form onSubmit={formik.handleSubmit}>
                 <input
-                  //Bind input into email value in formik
                   value={formik.values.email}
                   onChange={formik.handleChange("email")}
                   onBlur={formik.handleBlur("email")}
@@ -103,16 +97,14 @@ const Login = () => {
                 </div>}
 
                 <div>
-                  {userLoading? (
-                  <DisabledButton />
+                  {userLoading ? (<DisabledButton />
                   ) : (
-                  <button
-                    type="submit"
-                    className="btn btn-primary py-2 w-100 mb-4"
-                  >
-                    Login
-                  </button>
-                  )}
+                    <button
+                      type="submit"
+                      className="btn btn-primary py-2 w-100 mb-4"
+                    >
+                      Login
+                    </button>)}
                 </div>
               </form>
             </div>
